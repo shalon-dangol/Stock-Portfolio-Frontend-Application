@@ -1,47 +1,23 @@
 import Highcharts from "highcharts";
-import HighchartsReact from "highcharts-react-official";
+import HighchartsReactModule from "highcharts-react-official";
 import type { VolumePoint } from "../../types/stock";
 
-// Column chart showing trading volume over time
-// Uses the Highcharts React wrapper for easy integration
+const HighchartsReact =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ((HighchartsReactModule as any).default ?? (HighchartsReactModule as any).HighchartsReact ?? HighchartsReactModule) as typeof HighchartsReactModule;
 
-interface VolumeChartProps {
-  ticker: string;
-  data: VolumePoint[];
-}
+interface VolumeChartProps { ticker: string; data: VolumePoint[]; }
 
-function VolumeChart({ ticker, data }: VolumeChartProps) {
+export default function VolumeChart({ ticker, data }: VolumeChartProps) {
   const options: Highcharts.Options = {
-    title: {
-      text: `Trading Volume - ${ticker}`,
-    },
-    xAxis: {
-      categories: data.map((point) => point.date),
-      title: {
-        text: "Date",
-      },
-    },
-    yAxis: {
-      title: {
-        text: "Volume (shares)",
-      },
-    },
-    series: [
-      {
-        name: ticker,
-        type: "column",
-        data: data.map((point) => point.volume),
-      },
-    ],
-    tooltip: {
-      valueSuffix: " shares",
-    },
-    credits: {
-      enabled: false,
-    },
+    chart: { backgroundColor: "transparent", style: { fontFamily: "Inter, sans-serif" } },
+    title: { text: `Trading Volume — ${ticker}`, style: { fontWeight: "700", fontSize: "14px", color: "#0f172a" }, align: "left" },
+    xAxis: { categories: data.map((p) => p.date), title: { text: undefined }, labels: { style: { color: "#64748b", fontSize: "11px" } }, lineColor: "#e2e8f0", tickColor: "#e2e8f0" },
+    yAxis: { title: { text: undefined }, labels: { style: { color: "#64748b" } }, gridLineColor: "#f1f5f9" },
+    series: [{ name: ticker, type: "column", data: data.map((p) => p.volume), color: "#06b6d4", borderRadius: 4 as any, borderWidth: 0 }],
+    tooltip: { valueSuffix: " shares", backgroundColor: "#0f172a", style: { color: "#fff" }, borderWidth: 0, borderRadius: 10 },
+    credits: { enabled: false },
+    legend: { enabled: false },
   };
-
   return <HighchartsReact highcharts={Highcharts} options={options} />;
 }
-
-export default VolumeChart;

@@ -4,16 +4,17 @@ React + TypeScript frontend for visualizing stock performance and managing a per
 
 ## Features
 
-- **Charts (Highcharts)**: Responsive line chart (price trend) + column chart (trading volume), with mock/simulated data that syncs to portfolio holdings
-- **Portfolio Table (TanStack Table + MUI)**: Displays ticker, company, quantity, purchase price, current price, gain/loss; with filtering and sorting (bonus)
-- **CRUD**: Add / Edit / Delete stocks via MUI Dialog with immediate UI update
+- **Charts (Highcharts)**: Responsive line chart (price trend in NPR) + column chart (trading volume), with mock/simulated data that syncs to portfolio holdings
+- **Portfolio Table (TanStack Table + Tailwind CSS)**: Displays ticker, company, quantity, purchase price (NPR), current price (NPR), gain/loss (NPR); with filtering and sorting (bonus)
+- **CRUD**: Add / Edit / Delete stocks via Tailwind modal with immediate Redux update
 - **Validation**: Ticker/company required, quantity >0, price >=0, valid date (inline errors)
-- **State**: Zustand with `localStorage` persistence (bonus)
-- **Tests**: Vitest + Testing Library
+- **State**: Redux Toolkit (`@reduxjs/toolkit` + `react-redux`) with `localStorage` persistence (bonus)
+- **Currency**: All monetary values in **NPR (Nepali Rupees)** via `src/utils/currency.ts` (`en-NP` locale)
+- **Tests**: Vitest + Testing Library (24 tests)
 
 ## Tech Stack
 
-React 19, TypeScript, Vite, Zustand, Highcharts (`highcharts-react-official`), TanStack Table 9, MUI 9, Vitest, Testing Library, jsdom, Oxlint
+React 19, TypeScript, Vite 8, Redux Toolkit 2 + React-Redux 9, Highcharts 13 (`highcharts-react-official`), TanStack Table 9, Tailwind CSS 4 (`@tailwindcss/vite`), Vitest, Testing Library, jsdom, Oxlint
 
 ## Prerequisites
 
@@ -24,7 +25,7 @@ Node.js 18+
 ```bash
 npm install
 npm run dev      # http://localhost:5173
-npm run build    # tsc + vite build -> dist/
+npm run build    # tsc -b + vite build -> dist/
 npm run preview  # preview production build
 ```
 
@@ -44,10 +45,12 @@ src/
   components/portfolio/PortfolioTable.tsx, PortfolioSummary.tsx, StockFormDialog.tsx
   components/common/AppLayout.tsx
   pages/PortfolioPage.tsx, ChartsPage.tsx
-  store/portfolioStore.ts        # Zustand + localStorage
-  services/mockData.ts           # simulated price/volume history
+  store/portfolioSlice.ts          # Redux Toolkit slice + localStorage
+  store/index.ts                   # configureStore + typed hooks
+  services/mockData.ts             # simulated price/volume history (NPR)
   types/stock.ts
   utils/validation.ts
+  utils/currency.ts                # formatNPR()
   tests/setup.ts
 ```
 
@@ -57,4 +60,4 @@ AC-01 line chart, AC-02 column chart, AC-03 responsive, AC-04 portfolio table, A
 
 ## Git History
 
-Task-wise commits: `setup -> charts -> portfolio table + CRUD -> validation -> filtering/sorting & chart sync -> tests -> README`
+Task-wise commits: `setup -> charts -> portfolio table + CRUD -> validation -> filtering/sorting & chart sync -> tests -> README -> tailwind modern UI -> redux toolkit migration -> NPR localization`

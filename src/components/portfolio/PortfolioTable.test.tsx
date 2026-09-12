@@ -14,8 +14,8 @@ describe("PortfolioTable", () => {
     render(<PortfolioTable stocks={stocks} onEdit={vi.fn()} onDelete={vi.fn()} />);
     expect(screen.getByText("AAPL")).toBeInTheDocument();
     expect(screen.getByText("Microsoft")).toBeInTheDocument();
-    // gain/loss = (175-150)*10=250
-    expect(screen.getByText("$250.00")).toBeInTheDocument();
+    // gain/loss = (175-150)*10=250 (NPR with NBSP)
+    expect(screen.getByText(/250\.00/)).toBeInTheDocument();
   });
 
   it("calls onEdit and onDelete", async () => {

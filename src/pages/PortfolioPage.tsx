@@ -1,115 +1,58 @@
 import { useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 import PortfolioSummary from "../components/portfolio/PortfolioSummary";
 import PortfolioTable from "../components/portfolio/PortfolioTable";
 import StockFormDialog from "../components/portfolio/StockFormDialog";
-import { usePortfolioStore } from "../store/portfolioStore";
+import { useAppDispatch, useAppSelector } from "../store";
+import { addStock, updateStock, deleteStock } from "../store/portfolioSlice";
 import type { Stock, StockFormValues } from "../types/stock";
 
-// Portfolio page - displays the stock holdings table with summary
-// Supports adding, editing, and deleting stocks
-
-function PortfolioPage() {
-  const { stocks, addStock, updateStock, deleteStock } = usePortfolioStore();
-
-  // Dialog state: open/closed and which stock is being edited (null = adding new)
+export default function PortfolioPage() {
+  const stocks = useAppSelector((s) => s.portfolio.stocks);
+  const dispatch = useAppDispatch();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingStock, setEditingStock] = useState<Stock | null>(null);
 
-  // Open the dialog in "add" mode
-  function handleAddClick() {
-    setEditingStock(null);
-    setDialogOpen(true);
-  }
-
-  // Open the dialog in "edit" mode for the selected stock
-  function handleEditClick(stock: Stock) {
-    setEditingStock(stock);
-    setDialogOpen(true);
-  }
-
-  // Close the dialog without saving
-  function handleDialogClose() {
-    setDialogOpen(false);
-    setEditingStock(null);
-  }
-
-  // Save the form: add a new stock or update the existing one
+  function handleAddClick() { setEditingStock(null); setDialogOpen(true); }
+  function handleEditClick(stock: Stock) { setEditingStock(stock); setDialogOpen(true); }
+  function handleDialogClose() { setDialogOpen(false); setEditingStock(null); }
   function handleDialogSubmit(values: StockFormValues) {
     if (editingStock) {
-      updateStock(editingStock.id, {
+      dispatch(updateStock({ id: editingStock.id, updates: {
         companyName: values.companyName,
         quantity: Number(values.quantity),
         purchasePrice: Number(values.purchasePrice),
         purchaseDate: values.purchaseDate,
-      });
+      }}));
     } else {
-      addStock({
+      dispatch(addStock({
         ticker: values.ticker,
         companyName: values.companyName,
         quantity: Number(values.quantity),
         purchasePrice: Number(values.purchasePrice),
         purchaseDate: values.purchaseDate,
-      });
+      }));
     }
   }
-
-  // Delete a stock after confirmation
   function handleDeleteClick(stock: Stock) {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${stock.ticker} from your portfolio?`,
-    );
-    if (confirmed) {
-      deleteStock(stock.id);
-    }
+    if (window.confirm(`Are you sure you want to delete ${stock.ticker} from your portfolio?`)) dispatch(deleteStock(stock.id));
   }
 
   return (
     <div>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 3,
-        }}
-      >
-        <Typography variant="h4" component="h2">
-          My Portfolio
-        </Typography>
-
-        {/* Add stock button */}
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAddClick}
-        >
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900">My Portfolio</h2>
+          <p className="text-sm text-slate-500 mt-1">Track and manage your investments</p>
+        </div>
+        <button onClick={handleAddClick} className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/10 hover:bg-slate-800 transition">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
           Add Stock
-        </Button>
-      </Box>
+        </button>
+      </div>
 
-      {/* Summary cards */}
       <PortfolioSummary stocks={stocks} />
-
-      {/* Holdings table */}
-      <PortfolioTable
-        stocks={stocks}
-        onEdit={handleEditClick}
-        onDelete={handleDeleteClick}
-      />
-
-      {/* Add/Edit dialog */}
-      {/* The key prop remounts the dialog each time it opens, resetting form state */}
-      <StockFormDialog
-        key={editingStock ? editingStock.id : "new"}
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        onSubmit={handleDialogSubmit}
-        editingStock={editingStock}
-      />
+      <PortfolioTable stocks={stocks} onEdit={handleEditClick} onDelete={handleDeleteClick} />
+      <StockFormDialog key={editingStock ? editingStock.id : "new"} open={dialogOpen} onClose={handleDialogClose} onSubmit={handleDialogSubmit} editingStock={editingStock} />
     </div>
   );
 }
-
-export default PortfolioPage;

@@ -21,7 +21,7 @@ describe("StockFormDialog", () => {
     await user.type(screen.getByLabelText("Ticker Symbol"), "NVDA");
     await user.type(screen.getByLabelText("Company Name"), "NVIDIA");
     await user.type(screen.getByLabelText("Quantity"), "5");
-    await user.type(screen.getByLabelText("Purchase Price (USD)"), "400");
+    await user.type(screen.getByLabelText("Purchase Price (NPR)"), "400");
     // date input
     await user.type(screen.getByLabelText("Purchase Date"), "2024-05-01");
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
