@@ -1,6 +1,10 @@
 import { create } from "zustand";
 import type { Stock } from "../types/stock";
-import { getCurrentPrice, initialPortfolio } from "../services/mockData";
+import {
+  ensureTickerHistory,
+  getCurrentPrice,
+  initialPortfolio,
+} from "../services/mockData";
 
 // Portfolio state management using Zustand
 // Handles add, edit, delete, and persistence of stock holdings
@@ -41,11 +45,14 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
   // Add a new stock to the portfolio
   addStock: (stock) =>
     set((state) => {
+      // Ensure chart history exists for new tickers before getting price
+      ensureTickerHistory(stock.ticker, stock.purchasePrice);
       const newStock: Stock = {
         ...stock,
         id: crypto.randomUUID(),
+        ticker: stock.ticker.toUpperCase(),
         // Use the mock data service to get the current price for this ticker
-        currentPrice: getCurrentPrice(stock.ticker),
+        currentPrice: getCurrentPrice(stock.ticker.toUpperCase()),
       };
       const updatedStocks = [...state.stocks, newStock];
       saveStocks(updatedStocks);
