@@ -109,8 +109,32 @@ export const volumeHistoryByTicker: Record<string, VolumePoint[]> = {
   TSLA: generateVolumeHistory(),
 };
 
+// Ensure price/volume history exists for a ticker (creates on-demand for newly added stocks)
+export function ensureTickerHistory(ticker: string, basePrice?: number): void {
+  if (!priceHistoryByTicker[ticker]) {
+    const price = basePrice ?? 100 + Math.random() * 200;
+    priceHistoryByTicker[ticker] = generatePriceHistory(price, 5);
+  }
+  if (!volumeHistoryByTicker[ticker]) {
+    volumeHistoryByTicker[ticker] = generateVolumeHistory();
+  }
+}
+
+// Get price history for a ticker (ensures it exists)
+export function getPriceHistory(ticker: string): PricePoint[] {
+  ensureTickerHistory(ticker);
+  return priceHistoryByTicker[ticker];
+}
+
+// Get volume history for a ticker (ensures it exists)
+export function getVolumeHistory(ticker: string): VolumePoint[] {
+  ensureTickerHistory(ticker);
+  return volumeHistoryByTicker[ticker];
+}
+
 // Get the latest price for a ticker from the mock data
 export function getCurrentPrice(ticker: string): number {
+  ensureTickerHistory(ticker);
   const history = priceHistoryByTicker[ticker];
   if (!history || history.length === 0) {
     return 0;
