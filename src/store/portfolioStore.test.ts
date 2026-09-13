@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { configureStore } from "@reduxjs/toolkit";
-import portfolioReducer, { addStock, updateStock, deleteStock, setStocks } from "./portfolioSlice";
+import portfolioReducer, { addStock, updateStock, deleteStock, setStocks, persistStocks } from "./portfolioSlice";
 import { initialPortfolio } from "../services/mockData";
 
 if (!globalThis.crypto.randomUUID) {
@@ -9,7 +9,14 @@ if (!globalThis.crypto.randomUUID) {
 }
 
 function makeStore() {
-  return configureStore({ reducer: { portfolio: portfolioReducer } });
+  const store = configureStore({ reducer: { portfolio: portfolioReducer } });
+  // Mirror prod persistence (reducers are pure; persistence is via subscriber)
+  let prev = store.getState().portfolio.stocks;
+  store.subscribe(() => {
+    const cur = store.getState().portfolio.stocks;
+    if (cur !== prev) { prev = cur; persistStocks(cur); }
+  });
+  return store;
 }
 
 describe("portfolioStore (Redux Toolkit)", () => {

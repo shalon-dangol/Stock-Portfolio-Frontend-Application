@@ -1,12 +1,24 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
-import portfolioReducer from "./portfolioSlice";
+import portfolioReducer, { persistStocks } from "./portfolioSlice";
 
 export const store = configureStore({
   reducer: {
     portfolio: portfolioReducer,
   },
 });
+
+// Persist stocks to localStorage via subscriber (keeps reducers pure)
+if (typeof window !== "undefined") {
+  let prevStocks = store.getState().portfolio.stocks;
+  store.subscribe(() => {
+    const stocks = store.getState().portfolio.stocks;
+    if (stocks !== prevStocks) {
+      prevStocks = stocks;
+      persistStocks(stocks);
+    }
+  });
+}
 
 // For tests: factory to create isolated store
 export function createTestStore(preloadedStocks?: import("../types/stock").Stock[]) {

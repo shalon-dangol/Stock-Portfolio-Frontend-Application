@@ -43,7 +43,7 @@ describe("validateStockForm", () => {
   it("requires valid purchase date", () => {
     expect(validateStockForm({ ...valid, purchaseDate: "" }).purchaseDate).toBeDefined();
     expect(validateStockForm({ ...valid, purchaseDate: "not-a-date" }).purchaseDate).toBeDefined();
-    expect(validateStockForm({ ...valid, purchaseDate: "2024-02-30" }).purchaseDate).toBeUndefined(); // Date.parse parses overflow, acceptable per PRD
+    expect(validateStockForm({ ...valid, purchaseDate: "2024-02-30" }).purchaseDate).toBeDefined(); // overflow dates are now rejected
   });
 
   it("hasErrors detects errors", () => {

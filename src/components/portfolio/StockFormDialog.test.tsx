@@ -18,17 +18,44 @@ describe("StockFormDialog", () => {
     const onSubmit = vi.fn();
     const onClose = vi.fn();
     render(<StockFormDialog open onClose={onClose} onSubmit={onSubmit} editingStock={null} />);
-    await user.type(screen.getByLabelText("Ticker Symbol"), "NVDA");
-    await user.type(screen.getByLabelText("Company Name"), "NVIDIA");
+    await user.type(screen.getByLabelText("Ticker Symbol"), "NABIL");
+    await user.type(screen.getByLabelText("Company Name"), "Nabil Bank Limited");
     await user.type(screen.getByLabelText("Quantity"), "5");
     await user.type(screen.getByLabelText("Purchase Price (NPR)"), "400");
     // date input
     await user.type(screen.getByLabelText("Purchase Date"), "2024-05-01");
     await user.click(screen.getByRole("button", { name: "Add Stock" }));
     expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({ ticker: "NVDA", companyName: "NVIDIA" }),
+      expect.objectContaining({ ticker: "NABIL", companyName: "Nabil Bank Limited" }),
     );
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it("suggests stocks and fills ticker details", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <StockFormDialog
+        open
+        onClose={vi.fn()}
+        onSubmit={vi.fn()}
+        editingStock={null}
+        stockSuggestions={[
+          {
+            ticker: "NABIL",
+            companyName: "Nabil Bank Limited",
+            currentPrice: 526,
+            volume: 44305,
+          },
+        ]}
+      />,
+    );
+
+    await user.type(screen.getByLabelText("Ticker Symbol"), "nab");
+    await user.click(screen.getByRole("button", { name: /NABIL/i }));
+
+    expect(screen.getByDisplayValue("NABIL")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Nabil Bank Limited")).toBeInTheDocument();
   });
 
   it("prefills when editing", () => {
@@ -39,8 +66,8 @@ describe("StockFormDialog", () => {
         onSubmit={vi.fn()}
         editingStock={{
           id: "1",
-          ticker: "AAPL",
-          companyName: "Apple Inc.",
+          ticker: "NABIL",
+          companyName: "Nabil Bank Limited",
           quantity: 10,
           purchasePrice: 150,
           currentPrice: 175,
@@ -48,7 +75,7 @@ describe("StockFormDialog", () => {
         }}
       />,
     );
-    expect(screen.getByDisplayValue("AAPL")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("Apple Inc.")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("NABIL")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Nabil Bank Limited")).toBeInTheDocument();
   });
 });

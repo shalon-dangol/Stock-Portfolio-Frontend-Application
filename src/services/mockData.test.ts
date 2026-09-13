@@ -13,6 +13,6 @@ describe("mockData", () => {
   });
 
   it("returns price history for known ticker", () => {
-    expect(getPriceHistory("AAPL").length).toBe(30);
+    expect(getPriceHistory("NABIL").length).toBe(30);
   });
 });
